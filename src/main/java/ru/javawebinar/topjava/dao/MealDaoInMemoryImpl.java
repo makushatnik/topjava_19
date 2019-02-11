@@ -9,39 +9,45 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MealDaoImpl implements MealDao {
+public class MealDaoInMemoryImpl implements MealDao {
     private static final AtomicInteger counter = new AtomicInteger(0);
     private static final Map<Integer, Meal> mealsMap = new ConcurrentHashMap<>();
 
-    public MealDaoImpl() {
+    public MealDaoInMemoryImpl() {
         List<Meal> meals = MealsUtil.getMeals();
         meals.forEach(x -> {
-            int curId = counter.incrementAndGet();
-            x.setId(curId);
-            mealsMap.put(curId, x);
+            insertInner(x);
         });
     }
 
     @Override
-    public List<Meal> getMeals() {
+    public List<Meal> getList() {
         return new ArrayList<>(mealsMap.values());
     }
 
     @Override
     public Meal getById(int mealId) {
-        return mealsMap.getOrDefault(mealId, null);
+        return mealsMap.get(mealId);
     }
 
     @Override
-    public void insert(Meal meal) {
+    public Meal insert(Meal meal) {
+        insertInner(meal);
+        return meal;
+    }
+
+    private void insertInner(Meal meal) {
         int curId = counter.incrementAndGet();
         meal.setId(curId);
         mealsMap.put(curId, meal);
     }
 
     @Override
-    public void update(Meal meal) {
-        mealsMap.put(meal.getId(), meal);
+    public Meal update(Meal meal) {
+        if (mealsMap.containsKey(meal.getId())) {
+            mealsMap.put(meal.getId(), meal);
+        } else throw new RuntimeException("404! Еды с таким ИД не существует!");
+        return meal;
     }
 
     @Override

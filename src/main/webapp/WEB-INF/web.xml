@@ -9,7 +9,6 @@
     <servlet>
         <servlet-name>userServlet</servlet-name>
         <servlet-class>ru.javawebinar.topjava.web.UserServlet</servlet-class>
-        <load-on-startup>0</load-on-startup>
     </servlet>
     <servlet-mapping>
         <servlet-name>userServlet</servlet-name>
@@ -17,9 +16,17 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>mealServlet</servlet-name>
+        <servlet-class>ru.javawebinar.topjava.web.MealServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>mealServlet</servlet-name>
+        <url-pattern>/meals</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>mealExcessServlet</servlet-name>
         <servlet-class>ru.javawebinar.topjava.web.MealExcessServlet</servlet-class>
-        <load-on-startup>0</load-on-startup>
     </servlet>
     <servlet-mapping>
         <servlet-name>mealExcessServlet</servlet-name>
