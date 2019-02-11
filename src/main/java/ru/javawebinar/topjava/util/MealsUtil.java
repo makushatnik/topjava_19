@@ -16,7 +16,6 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 
 public class MealsUtil {
-    //--- For Common HomeWork 1
     private static final List<Meal> meals = new ArrayList<>();
 
     static {
@@ -31,7 +30,6 @@ public class MealsUtil {
     public static List<Meal> getMeals() {
         return meals;
     }
-    //---
 
     public static void main(String[] args) {
         List<MealTo> mealsWithExcess = getFilteredWithExcess(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);

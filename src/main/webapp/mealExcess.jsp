@@ -19,7 +19,6 @@
         <td width="150px">Date</td>
         <td width="200px">Description</td>
         <td width="50px">Calories</td>
-        <td width="100px">Excess</td>
     </tr>
     <c:forEach var="meal" items="${meals}">
         <fmt:format value="${meal.dateTime}" style="MS" var="parsedDate" />
@@ -27,10 +26,8 @@
             <td>${parsedDate}</td>
             <td>${meal.description}</td>
             <td>${meal.calories}</td>
-            <td>${meal.excess ? 'превышено' : 'норма'}</td>
         </tr>
     </c:forEach>
 </table>
-<p><a href="meals?action=insert">Add Meal</a></p>
 </body>
 </html>
