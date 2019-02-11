@@ -24,13 +24,4 @@
         <url-pattern>/meals</url-pattern>
     </servlet-mapping>
 
-    <servlet>
-        <servlet-name>mealExcessServlet</servlet-name>
-        <servlet-class>ru.javawebinar.topjava.web.MealExcessServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>mealExcessServlet</servlet-name>
-        <url-pattern>/meals-excess</url-pattern>
-    </servlet-mapping>
-
 </web-app>

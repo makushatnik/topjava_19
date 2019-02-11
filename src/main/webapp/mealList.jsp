@@ -7,6 +7,8 @@
     <style type="text/css">
         .center { text-align: center; }
         .bold { font-weight: bold; }
+        .green { color: green; }
+        .red { color: red; }
     </style>
 </head>
 <body>
@@ -21,7 +23,7 @@
     </tr>
     <c:forEach var="meal" items="${meals}">
         <fmt:format value="${meal.dateTime}" style="MS" var="parsedDate" />
-        <tr class="center">
+        <tr class="center ${meal.excess ? 'red' : 'green' }">
             <td>${parsedDate}</td>
             <td>${meal.description}</td>
             <td>${meal.calories}</td>

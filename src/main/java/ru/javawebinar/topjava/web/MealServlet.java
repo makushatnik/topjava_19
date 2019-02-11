@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.javawebinar.topjava.dao.MealDao;
 import ru.javawebinar.topjava.dao.MealDaoInMemoryImpl;
-import ru.javawebinar.topjava.dao.MealsFactory;
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.model.MealTo;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -14,13 +14,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MealServlet extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(MealServlet.class);
     private static final String EDIT_PAGE = "/meal.jsp";
     private static final String LIST_PAGE = "/mealList.jsp";
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-    private static final MealDao dao = MealsFactory.getDao();
+    private static final MealDao dao = new MealDaoInMemoryImpl();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -29,15 +31,9 @@ public class MealServlet extends HttpServlet {
         int mealId;
         String action = request.getParameter("action");
         if (action == null) {
-            page = LIST_PAGE;
-            request.setAttribute("meals", dao.getList());
-            request.getRequestDispatcher(page).forward(request, response);
+            action = "list";
         } else action = action.toLowerCase();
         switch (action) {
-            case "list":
-                page = LIST_PAGE;
-                request.setAttribute("meals", dao.getList());
-                break;
             case "delete":
                 mealId = Integer.parseInt(request.getParameter("mealId"));
                 dao.delete(mealId);
@@ -54,9 +50,18 @@ public class MealServlet extends HttpServlet {
             case "insert":
                 page = EDIT_PAGE;
                 break;
+            case "list":
             default:
                 page = LIST_PAGE;
-                request.setAttribute("meals", dao.getList());
+                List<Meal> list = dao.getList();
+                final List<MealTo> res = new ArrayList<>();
+                list.forEach(x -> {
+                    boolean excess = false;
+                    MealTo mealTo = dao.getMealToByDate(x.getDateTime());
+                    res.add(new MealTo(x.getId(), x.getDateTime(), x.getDescription(), x.getCalories(),
+                            mealTo != null && mealTo.isExcess()));
+                });
+                request.setAttribute("meals", res);
         }
 
         if (!redirect) {
@@ -80,12 +85,12 @@ public class MealServlet extends HttpServlet {
         );
 
         if(mealId == null || mealId.isEmpty()) {
-            dao.insert(meal);
+            dao.insert(meal, true);
         } else {
             meal.setId(Integer.parseInt(mealId));
             dao.update(meal);
         }
-        request.setAttribute("meals", dao.getList());
-        request.getRequestDispatcher(LIST_PAGE).forward(request, response);
+
+        response.sendRedirect("meals");
     }
 }
