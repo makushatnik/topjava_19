@@ -10,6 +10,10 @@ public class ValidationUtil {
         return checkNotFound(object, "id=" + id);
     }
 
+    public static <T> T checkNotFoundMeal(T object, int id, int userId) {
+        return checkNotFound(object, "id=" + id + ", userId=" + id);
+    }
+
     public static void checkNotFoundWithId(boolean found, int id) {
         checkNotFound(found, "id=" + id);
     }
