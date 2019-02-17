@@ -23,7 +23,6 @@ public class SpringMain {
 
             MealRestController mealController = appCtx.getBean(MealRestController.class);
             mealController.create(new Meal(null, LocalDateTime.now(), "This is the Description", 150));
-            mealController.getAllFilter(LocalDate.MIN, LocalTime.MIN, LocalDate.MAX, LocalTime.MAX);
             mealController.getAll();
         }
     }

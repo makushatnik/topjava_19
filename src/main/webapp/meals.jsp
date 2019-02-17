@@ -21,6 +21,11 @@
     <h3><a href="index.html">Home</a></h3>
     <h2>Meals</h2>
     <a href="meals?action=create">Add Meal</a>
+    <form action="meals" method="post">
+        <input type="datetime-local" name="startDate"/>
+        <input type="datetime-local" name="endDate"/>
+        <input type="submit" value="Фильтр"/>
+    </form>
     <hr/>
     <table border="1" cellpadding="8" cellspacing="0">
         <thead>
