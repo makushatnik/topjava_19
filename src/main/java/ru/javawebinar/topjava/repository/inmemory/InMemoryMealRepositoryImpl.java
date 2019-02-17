@@ -7,15 +7,16 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.util.MealsUtil;
+import ru.javawebinar.topjava.web.SecurityUtil;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Month;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-
-import static ru.javawebinar.topjava.web.SecurityUtil.authUserId;
 
 @Repository
 public class InMemoryMealRepositoryImpl implements MealRepository {
@@ -24,7 +25,12 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
     private AtomicInteger counter = new AtomicInteger(0);
 
     {
-        MealsUtil.MEALS.forEach(x -> save(x, authUserId()));
+        MealsUtil.MEALS.forEach(x -> save(x, SecurityUtil.ADMIN_ID));
+        save(new Meal(LocalDateTime.of(2016, Month.APRIL, 5, 11, 0), "Завтрак", 250), SecurityUtil.USER_ID);
+        save(new Meal(LocalDateTime.of(2016, Month.APRIL, 5, 11, 0), "Брекфаст", 350), SecurityUtil.USER_ID);
+        save(new Meal(LocalDateTime.of(2016, Month.APRIL, 5, 11, 0), "Обед", 500), SecurityUtil.USER_ID);
+        save(new Meal(LocalDateTime.of(2016, Month.APRIL, 5, 16, 0), "Ланч", 350), SecurityUtil.USER_ID);
+        save(new Meal(LocalDateTime.of(2016, Month.APRIL, 5, 20, 0), "Ужин", 750), SecurityUtil.USER_ID);
     }
 
     @Override
@@ -54,10 +60,10 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
     public boolean delete(int id, int userId) {
         log.info("delete by id {} for userId - {}", id, userId);
         Map<Integer, Meal> userMeal = repository.get(userId);
-        if (userMeal != null && userMeal.containsKey(id)) {
-            userMeal.remove(id);
+        if (userMeal != null) {
+            Meal meal = userMeal.remove(id);
             repository.put(userId, userMeal);
-            return true;
+            return meal != null;
         }
         return false;
     }
@@ -78,7 +84,11 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
         Map<Integer, Meal> userMeal = repository.get(userId);
         if (userMeal != null) {
             List<Meal> meals = new ArrayList<>(userMeal.values());
-            meals.sort(Collections.reverseOrder());
+            Comparator<Meal> mealComparator
+                    = Comparator.comparing(Meal::getDateTime);
+            mealComparator = mealComparator.reversed();
+            meals.sort(mealComparator);
+
             return meals;
         }
         return Collections.emptyList();
@@ -87,8 +97,7 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
     @Override
     public List<Meal> getAllFilter(int userId, LocalDate startDate, LocalTime startTime, LocalDate endDate,
            LocalTime endTime) {
-        log.info("getAllFilter for userId - {}", userId);
-        log.info("filter - {}. {}. {}. {}", startDate, startTime, endDate, endTime);
+        log.info("getAllFilter for userId - {}. filter - {}. {}. {}. {}", userId, startDate, startTime, endDate, endTime);
         Map<Integer, Meal> userMeal = repository.get(userId);
         if (userMeal != null) {
             return userMeal.values().stream()

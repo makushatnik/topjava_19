@@ -44,7 +44,9 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
     public List<User> getAll() {
         log.info("getAll");
         List<User> users = new ArrayList<>(repository.values());
-        Collections.sort(users);
+        Comparator<User> userComparator
+                = Comparator.comparing(User::getName);
+        users.sort(userComparator);
         return users;
     }
 

@@ -29,9 +29,9 @@ public class MealServiceImpl implements MealService {
     }
 
     @Override
-    public List<Meal> getAllFilter(int userId, LocalDateTime startDate, LocalDateTime endDate) {
-        return repository.getAllFilter(userId, startDate.toLocalDate(), startDate.toLocalTime(),
-                endDate.toLocalDate(), endDate.toLocalTime());
+    public List<Meal> getAllFilter(int userId, LocalDate startDate, LocalTime startTime, LocalDate endDate,
+           LocalTime endTime) {
+        return repository.getAllFilter(userId, startDate, startTime, endDate, endTime);
     }
 
     @Override

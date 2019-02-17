@@ -14,6 +14,22 @@
         .excess {
             color: red;
         }
+        dl {
+            background: none repeat scroll 0 0 #FAFAFA;
+            margin: 8px 0;
+            padding: 0;
+        }
+
+        dt {
+            display: inline-block;
+            width: 170px;
+        }
+
+        dd {
+            display: inline-block;
+            margin-left: 8px;
+            vertical-align: top;
+        }
     </style>
 </head>
 <body>
@@ -21,9 +37,24 @@
     <h3><a href="index.html">Home</a></h3>
     <h2>Meals</h2>
     <a href="meals?action=create">Add Meal</a>
-    <form action="meals" method="post">
-        <input type="datetime-local" name="startDate"/>
-        <input type="datetime-local" name="endDate"/>
+    <form action="meals?action=filter" method="post">
+        <dl>
+            <dt>Start Date (yyyy-MM-dd):</dt>
+            <input type="text" name="startDate" value="${startDate}"/>
+        </dl>
+        <dl>
+            <dt>Start Time:</dt>
+            <input type="text" name="startTime" value="${startTime}"/>
+        </dl>
+        <dl>
+            <dt>End Date (yyyy-MM-dd):</dt>
+            <input type="text" name="endDate" value="${endDate}"/>
+        </dl>
+        <dl>
+            <dt>End Time:</dt>
+            <input type="text" name="endTime" value="${endTime}"/>
+        </dl>
+
         <input type="submit" value="Фильтр"/>
     </form>
     <hr/>
@@ -41,10 +72,7 @@
             <jsp:useBean id="meal" scope="page" type="ru.javawebinar.topjava.to.MealTo"/>
             <tr class="${meal.excess ? 'excess' : 'normal'}">
                 <td>
-                        <%--${meal.dateTime.toLocalDate()} ${meal.dateTime.toLocalTime()}--%>
-                        <%--<%=TimeUtil.toString(meal.getDateTime())%>--%>
-                        <%--${fn:replace(meal.dateTime, 'T', ' ')}--%>
-                        ${fn:formatDateTime(meal.dateTime)}
+                    ${fn:formatDateTime(meal.dateTime)}
                 </td>
                 <td>${meal.description}</td>
                 <td>${meal.calories}</td>

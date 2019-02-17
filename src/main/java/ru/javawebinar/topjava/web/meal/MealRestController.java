@@ -4,14 +4,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import ru.javawebinar.topjava.Constants;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
+import ru.javawebinar.topjava.to.MealTo;
+import ru.javawebinar.topjava.util.MealsUtil;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import static ru.javawebinar.topjava.util.ValidationUtil.assureIdConsistent;
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
+import static ru.javawebinar.topjava.web.SecurityUtil.authUserCaloriesPerDay;
 import static ru.javawebinar.topjava.web.SecurityUtil.authUserId;
 
 @Controller
@@ -25,16 +30,22 @@ public class MealRestController {
         this.service = service;
     }
 
-    public List<Meal> getAll() {
+    public List<MealTo> getAll() {
         log.info("getAll");
-        return service.getAll(authUserId());
+        List<Meal> meals = service.getAll(authUserId());
+        return MealsUtil.getWithExcess(meals, authUserCaloriesPerDay());
     }
 
-    public List<Meal> getAllFilter(LocalDateTime startDate, LocalDateTime endDate) {
+    public List<MealTo> getAllFilter(String startDateStr, String startTimeStr, String endDateStr, String endTimeStr) {
         log.info("getAllFilter");
-        if (startDate.getYear() < 2010) startDate = startDate.withYear(2010);
-        if (endDate.getYear() > 2025) endDate = endDate.withYear(2025);
-        return service.getAllFilter(authUserId(), startDate, endDate);
+        LocalDate startDate = LocalDate.parse(startDateStr.isEmpty() ? Constants.MIN_DATE : startDateStr);
+        LocalTime startTime = LocalTime.parse(startTimeStr.isEmpty() ? Constants.MIN_TIME : startTimeStr);
+        LocalDate endDate = LocalDate.parse(endDateStr.isEmpty() ? Constants.MAX_DATE : endDateStr);
+        LocalTime endTime = LocalTime.parse(endTimeStr.isEmpty() ? Constants.MAX_TIME : endTimeStr);
+        if (startDate.getYear() < Constants.MIN_YEAR) startDate = startDate.withYear(Constants.MIN_YEAR);
+        if (endDate.getYear() > Constants.MAX_YEAR) endDate = endDate.withYear(Constants.MAX_YEAR);
+        List<Meal> meals = service.getAllFilter(authUserId(), startDate, startTime, endDate, endTime);
+        return MealsUtil.getWithExcess(meals, authUserCaloriesPerDay());
     }
 
     public Meal get(int id) {

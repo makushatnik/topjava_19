@@ -23,10 +23,8 @@ public class UserServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String idStr = request.getParameter("userId");
         if (idStr != null && !idStr.isEmpty()) {
-            int id = Integer.parseInt(idStr);
-            if (id < 0) throw new RuntimeException("Не корректный ИД пользователя!");
-            SecurityUtil.setAuthUserId(id);
-            request.getRequestDispatcher("/users.jsp").forward(request, response);
+            SecurityUtil.setAuthUserId(Integer.parseInt(idStr));
+            response.sendRedirect("meals");
         }
     }
 }
