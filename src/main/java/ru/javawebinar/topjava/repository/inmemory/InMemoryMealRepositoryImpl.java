@@ -26,9 +26,9 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
 
     {
         MealsUtil.MEALS.forEach(x -> save(x, SecurityUtil.ADMIN_ID));
-        save(new Meal(LocalDateTime.of(2016, Month.APRIL, 5, 11, 0), "Завтрак", 250), SecurityUtil.USER_ID);
+        save(new Meal(LocalDateTime.of(2016, Month.APRIL, 5, 8, 0), "Завтрак", 250), SecurityUtil.USER_ID);
         save(new Meal(LocalDateTime.of(2016, Month.APRIL, 5, 11, 0), "Брекфаст", 350), SecurityUtil.USER_ID);
-        save(new Meal(LocalDateTime.of(2016, Month.APRIL, 5, 11, 0), "Обед", 500), SecurityUtil.USER_ID);
+        save(new Meal(LocalDateTime.of(2016, Month.APRIL, 5, 13, 0), "Обед", 500), SecurityUtil.USER_ID);
         save(new Meal(LocalDateTime.of(2016, Month.APRIL, 5, 16, 0), "Ланч", 350), SecurityUtil.USER_ID);
         save(new Meal(LocalDateTime.of(2016, Month.APRIL, 5, 20, 0), "Ужин", 750), SecurityUtil.USER_ID);
     }
@@ -38,20 +38,13 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
         log.info("save {} for userId - {}", meal, userId);
         if (meal.isNew()) {
             meal.setId(counter.incrementAndGet());
-            Map<Integer, Meal> userMeal = repository.get(userId);
-            if (userMeal == null) {
-                userMeal = new ConcurrentHashMap<>();
-            }
-            userMeal.put(meal.getId(), meal);
-            repository.put(userId, userMeal);
-            return meal;
+            Map<Integer, Meal> userMeal = repository.computeIfAbsent(userId, (k) -> new ConcurrentHashMap<>());
+            return userMeal.put(meal.getId(), meal);
         }
         // treat case: update, but absent in storage
         Map<Integer, Meal> userMeal = repository.get(userId);
         if (userMeal != null) {
-            userMeal.computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
-            repository.put(userId, userMeal);
-            return meal;
+            return userMeal.computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
         }
         return null;
     }
@@ -60,12 +53,7 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
     public boolean delete(int id, int userId) {
         log.info("delete by id {} for userId - {}", id, userId);
         Map<Integer, Meal> userMeal = repository.get(userId);
-        if (userMeal != null) {
-            Meal meal = userMeal.remove(id);
-            repository.put(userId, userMeal);
-            return meal != null;
-        }
-        return false;
+        return userMeal != null && userMeal.remove(id) != null;
     }
 
     @Override
@@ -83,13 +71,7 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
         log.info("getAll for userId - {}", userId);
         Map<Integer, Meal> userMeal = repository.get(userId);
         if (userMeal != null) {
-            List<Meal> meals = new ArrayList<>(userMeal.values());
-            Comparator<Meal> mealComparator
-                    = Comparator.comparing(Meal::getDateTime);
-            mealComparator = mealComparator.reversed();
-            meals.sort(mealComparator);
-
-            return meals;
+            return sorting(new ArrayList<>(userMeal.values()));
         }
         return Collections.emptyList();
     }
@@ -100,12 +82,19 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
         log.info("getAllFilter for userId - {}. filter - {}. {}. {}. {}", userId, startDate, startTime, endDate, endTime);
         Map<Integer, Meal> userMeal = repository.get(userId);
         if (userMeal != null) {
-            return userMeal.values().stream()
+            return sorting(userMeal.values().stream()
                 .filter(x -> DateTimeUtil.isBetween(x.getDate(), startDate, endDate))
                 .filter(x -> DateTimeUtil.isBetween(x.getTime(), startTime, endTime))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
         }
         return Collections.emptyList();
+    }
+
+    private List<Meal> sorting(List<Meal> meals) {
+        Comparator<Meal> mealComparator
+                = Comparator.comparing(Meal::getDateTime, Collections.reverseOrder());
+        meals.sort(mealComparator);
+        return meals;
     }
 }
 

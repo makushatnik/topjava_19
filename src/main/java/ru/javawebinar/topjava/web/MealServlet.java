@@ -13,7 +13,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
@@ -61,11 +63,11 @@ public class MealServlet extends HttpServlet {
                 List<MealTo> meals = null;
                 if (startDateStr != null && startTimeStr != null &&
                     endDateStr != null && endTimeStr != null) {
-                    meals = mealController.getAllFilter(startDateStr, startTimeStr, endDateStr, endTimeStr);
-                    request.setAttribute("startDate", startDateStr);
-                    request.setAttribute("startTime", startTimeStr);
-                    request.setAttribute("endDate", endDateStr);
-                    request.setAttribute("endTime", endTimeStr);
+                    LocalDate startDate = startDateStr.isEmpty() ? LocalDate.MIN : LocalDate.parse(startDateStr);
+                    LocalTime startTime = startTimeStr.isEmpty() ? LocalTime.MIN : LocalTime.parse(startTimeStr);
+                    LocalDate endDate = endDateStr.isEmpty() ? LocalDate.MAX : LocalDate.parse(endDateStr);
+                    LocalTime endTime = endTimeStr.isEmpty() ? LocalTime.MAX : LocalTime.parse(endTimeStr);
+                    meals = mealController.getAllFilter(startDate, startTime, endDate, endTime);
                 } else {
                     meals = mealController.getAll();
                 }
