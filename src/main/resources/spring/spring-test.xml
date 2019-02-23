@@ -1,23 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-
-    <bean class="ru.javawebinar.topjava.repository.jdbc.JdbcUserRepositoryImpl" id="jdbcUserRepository"/>
-    <bean class="ru.javawebinar.topjava.repository.jdbc.JdbcMealRepositoryImpl" id="jdbcMealRepository"/>
+    <bean class="ru.javawebinar.topjava.repository.inmemory.InMemoryUserRepositoryImpl" id="inmemoryUserRepository"/>
+    <bean class="ru.javawebinar.topjava.repository.inmemory.InMemoryMealRepositoryImpl" id="inmemoryMealRepository"/>
 
     <bean class="ru.javawebinar.topjava.service.UserServiceImpl">
-        <constructor-arg name="repository" ref="jdbcUserRepository"/>
+        <constructor-arg name="repository" ref="inmemoryUserRepository"/>
     </bean>
 
     <bean class="ru.javawebinar.topjava.service.MealServiceImpl">
-        <constructor-arg name="repository" ref="jdbcMealRepository"/>
+        <constructor-arg name="repository" ref="inmemoryMealRepository"/>
     </bean>
-
-    <!-- Not necessary, already included with component-scan -->
-    <!--<context:annotation-config/>-->
 
     <!--context:component-scan base-package="ru.javawebinar.**.repository"/-->
 

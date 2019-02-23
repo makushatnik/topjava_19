@@ -7,12 +7,12 @@ import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.inmemory.InMemoryUserRepositoryImpl;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
-import ru.javawebinar.topjava.web.user.AdminRestController;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import static ru.javawebinar.topjava.UserTestData.ADMIN;
+import static ru.javawebinar.topjava.UserTestData.USER;
 
 public class InMemoryAdminRestControllerTest {
     private static ConfigurableApplicationContext appCtx;
@@ -21,7 +21,7 @@ public class InMemoryAdminRestControllerTest {
     @BeforeClass
     public static void beforeClass() {
         appCtx = new ClassPathXmlApplicationContext(
-                "spring/spring-app.xml", "spring/spring-db.xml");
+                "spring/spring-test.xml");
         System.out.println("\n" + Arrays.toString(appCtx.getBeanDefinitionNames()) + "\n");
         controller = appCtx.getBean(AdminRestController.class);
     }
@@ -36,6 +36,8 @@ public class InMemoryAdminRestControllerTest {
         // re-initialize
         InMemoryUserRepositoryImpl repository = appCtx.getBean(InMemoryUserRepositoryImpl.class);
         repository.init();
+        repository.put(UserTestData.USER_ID, USER);
+        repository.put(UserTestData.ADMIN_ID, ADMIN);
     }
 
     @Test

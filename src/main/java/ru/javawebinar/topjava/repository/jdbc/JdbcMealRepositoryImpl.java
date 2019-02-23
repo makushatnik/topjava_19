@@ -22,6 +22,7 @@ public class JdbcMealRepositoryImpl implements MealRepository {
             "WHERE datetime between ?::timestamp AND ?::timestamp " +
             "ORDER BY datetime DESC";
     private static final String GET_BY_ID_QUERY = "SELECT * FROM meals WHERE id=?";
+    private static final String DELETE_ALL_QUERY = "TRUNCATE TABLE meals";
     private static final String DELETE_QUERY = "DELETE FROM meals WHERE id=?";
     private static final String UPDATE_QUERY = "UPDATE meals " +
             "SET datetime=:datetime, description=:description, calories=:calories " +
@@ -82,5 +83,9 @@ public class JdbcMealRepositoryImpl implements MealRepository {
     public List<Meal> getBetween(LocalDateTime startDate, LocalDateTime endDate, int userId) {
         return jdbcTemplate.query(GET_BETWEEN_QUERY, ROW_MAPPER,
                 startDate.format(formatter), endDate.format(formatter));
+    }
+
+    public void init() {
+        jdbcTemplate.execute(DELETE_ALL_QUERY);
     }
 }
