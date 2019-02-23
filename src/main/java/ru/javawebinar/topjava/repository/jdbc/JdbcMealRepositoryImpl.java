@@ -17,10 +17,9 @@ import java.util.List;
 
 @Repository
 public class JdbcMealRepositoryImpl implements MealRepository {
-    private static final String GET_ALL_QUERY = "SELECT * FROM meals ORDER BY datetime DESC";
+    private static final String GET_ALL_QUERY = "SELECT * FROM meals";
     private static final String GET_BETWEEN_QUERY = "SELECT * FROM meals " +
-            "WHERE datetime between ?::timestamp AND ?::timestamp " +
-            "ORDER BY datetime DESC";
+            "WHERE datetime between ?::timestamp AND ?::timestamp";
     private static final String GET_BY_ID_QUERY = "SELECT * FROM meals WHERE id=?";
     private static final String DELETE_ALL_QUERY = "TRUNCATE TABLE meals";
     private static final String DELETE_QUERY = "DELETE FROM meals WHERE id=?";
