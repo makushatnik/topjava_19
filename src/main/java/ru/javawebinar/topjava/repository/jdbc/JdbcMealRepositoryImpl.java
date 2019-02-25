@@ -17,15 +17,15 @@ import java.util.List;
 
 @Repository
 public class JdbcMealRepositoryImpl implements MealRepository {
-    private static final String GET_ALL_QUERY = "SELECT * FROM meals";
+    private static final String GET_ALL_QUERY = "SELECT * FROM meals WHERE user_id=? ORDER BY datetime DESC";
     private static final String GET_BETWEEN_QUERY = "SELECT * FROM meals " +
-            "WHERE datetime between ?::timestamp AND ?::timestamp";
-    private static final String GET_BY_ID_QUERY = "SELECT * FROM meals WHERE id=?";
-    private static final String DELETE_ALL_QUERY = "TRUNCATE TABLE meals";
-    private static final String DELETE_QUERY = "DELETE FROM meals WHERE id=?";
+            "WHERE datetime between ?::timestamp AND ?::timestamp AND user_id=? " +
+            "ORDER BY datetime DESC";
+    private static final String GET_BY_ID_QUERY = "SELECT * FROM meals WHERE id=? AND user_id=?";
+    private static final String DELETE_QUERY = "DELETE FROM meals WHERE id=? AND user_id=?";
     private static final String UPDATE_QUERY = "UPDATE meals " +
             "SET datetime=:datetime, description=:description, calories=:calories " +
-            "WHERE id=:id";
+            "WHERE id=:id AND user_id=:user_id";
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:ss");
 
     private static final BeanPropertyRowMapper<Meal> ROW_MAPPER = BeanPropertyRowMapper.newInstance(Meal.class);
@@ -49,6 +49,7 @@ public class JdbcMealRepositoryImpl implements MealRepository {
     public Meal save(Meal meal, int userId) {
         MapSqlParameterSource map = new MapSqlParameterSource()
                 .addValue("id", meal.getId())
+                .addValue("user_id", userId)
                 .addValue("datetime", meal.getDateTime())
                 .addValue("description", meal.getDescription())
                 .addValue("calories", meal.getCalories());
@@ -64,27 +65,23 @@ public class JdbcMealRepositoryImpl implements MealRepository {
 
     @Override
     public boolean delete(int id, int userId) {
-        return jdbcTemplate.update(DELETE_QUERY, id) != 0;
+        return jdbcTemplate.update(DELETE_QUERY, id, userId) != 0;
     }
 
     @Override
     public Meal get(int id, int userId) {
-        List<Meal> meals = jdbcTemplate.query(GET_BY_ID_QUERY, ROW_MAPPER, id);
+        List<Meal> meals = jdbcTemplate.query(GET_BY_ID_QUERY, ROW_MAPPER, id, userId);
         return DataAccessUtils.singleResult(meals);
     }
 
     @Override
     public List<Meal> getAll(int userId) {
-        return jdbcTemplate.query(GET_ALL_QUERY, ROW_MAPPER);
+        return jdbcTemplate.query(GET_ALL_QUERY, ROW_MAPPER, userId);
     }
 
     @Override
     public List<Meal> getBetween(LocalDateTime startDate, LocalDateTime endDate, int userId) {
         return jdbcTemplate.query(GET_BETWEEN_QUERY, ROW_MAPPER,
-                startDate.format(formatter), endDate.format(formatter));
-    }
-
-    public void init() {
-        jdbcTemplate.execute(DELETE_ALL_QUERY);
+                startDate.format(formatter), endDate.format(formatter), userId);
     }
 }

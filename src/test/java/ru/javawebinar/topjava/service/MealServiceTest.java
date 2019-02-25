@@ -4,11 +4,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDateTime;
@@ -37,7 +39,7 @@ public class MealServiceTest {
     @Test
     public void getAll() throws Exception {
         List<Meal> all = service.getAll(USER_ID);
-        assertMatch(all, MEALS);
+        assertMatch(all, MealsUtil.getSortedDatetimeDesc(Arrays.asList(MEAL0, MEAL1, MEAL2, MEAL3, MEAL4, MEAL5)));
     }
 
     @Test
@@ -45,7 +47,7 @@ public class MealServiceTest {
         List<Meal> all = service.getBetweenDateTimes(
                 LocalDateTime.of(2015, Month.MAY, 30, 10, 0),
                 LocalDateTime.of(2015, Month.MAY, 30, 13, 0), USER_ID);
-        assertMatch(all, Arrays.asList(MEAL0, MEAL1));
+        assertMatch(all, MealsUtil.getSortedDatetimeDesc(Arrays.asList(MEAL0, MEAL1)));
     }
 
     @Test
@@ -55,8 +57,13 @@ public class MealServiceTest {
     }
 
     @Test(expected = NotFoundException.class)
+    public void getAlien() {
+        service.get(START_ID + 6, USER_ID);
+    }
+
+    @Test(expected = NotFoundException.class)
     public void getNotFound() throws Exception {
-        service.get(100020, USER_ID);
+        service.get(START_ID + 11, USER_ID);
     }
 
     @Test
@@ -65,6 +72,21 @@ public class MealServiceTest {
         Meal created = service.create(newMeal, USER_ID);
         newMeal.setId(created.getId());
         assertMatch(service.get(newMeal.getId(), USER_ID), newMeal);
+    }
+
+    @Test
+    public void saveAlien() {
+        Meal alien = new Meal(START_ID + 6, LocalDateTime.of(2017, Month.MAY, 30, 10, 0),
+                "This is Changed Description", 555);
+        Meal updated = service.create(alien, USER_ID);
+        assertMatch(updated, null);
+    }
+
+    @Test(expected = DuplicateKeyException.class)
+    public void theSameDate() {
+        Meal meal = new Meal(LocalDateTime.of(2015, Month.MAY, 30, 10, 0),
+                "Some Description", 14623);
+        service.create(meal, USER_ID);
     }
 
     @Test
@@ -80,6 +102,11 @@ public class MealServiceTest {
     @Test
     public void delete() throws Exception {
         service.delete(START_ID, USER_ID);
-        assertMatch(service.getAll(USER_ID), MEALS_DELETED);
+        assertMatch(service.getAll(USER_ID), MealsUtil.getSortedDatetimeDesc(MEALS_DELETED));
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void deleteAlien() {
+        service.delete(START_ID + 6, USER_ID);
     }
 }
