@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static ru.javawebinar.topjava.UserTestData.ADMIN;
-import static ru.javawebinar.topjava.UserTestData.USER;
 
 public class InMemoryAdminRestControllerTest {
     private static ConfigurableApplicationContext appCtx;
@@ -21,7 +20,7 @@ public class InMemoryAdminRestControllerTest {
     @BeforeClass
     public static void beforeClass() {
         appCtx = new ClassPathXmlApplicationContext(
-                "spring/spring-test.xml");
+                "spring/spring-app.xml", "spring/inmemory.xml");
         System.out.println("\n" + Arrays.toString(appCtx.getBeanDefinitionNames()) + "\n");
         controller = appCtx.getBean(AdminRestController.class);
     }
@@ -36,8 +35,6 @@ public class InMemoryAdminRestControllerTest {
         // re-initialize
         InMemoryUserRepositoryImpl repository = appCtx.getBean(InMemoryUserRepositoryImpl.class);
         repository.init();
-        repository.put(UserTestData.USER_ID, USER);
-        repository.put(UserTestData.ADMIN_ID, ADMIN);
     }
 
     @Test

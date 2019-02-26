@@ -11,14 +11,12 @@ import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.inmemory.InMemoryUserRepositoryImpl;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
-import ru.javawebinar.topjava.web.user.AdminRestController;
 
 import java.util.Collection;
 
 import static ru.javawebinar.topjava.UserTestData.ADMIN;
-import static ru.javawebinar.topjava.UserTestData.USER;
 
-@ContextConfiguration({"classpath:spring/spring-test.xml"})
+@ContextConfiguration({"classpath:spring/spring-app.xml","classpath:spring/inmemory.xml"})
 @RunWith(SpringRunner.class)
 public class InMemoryAdminRestControllerSpringTest {
 
@@ -31,8 +29,6 @@ public class InMemoryAdminRestControllerSpringTest {
     @Before
     public void setUp() throws Exception {
         repository.init();
-        repository.put(UserTestData.USER_ID, USER);
-        repository.put(UserTestData.ADMIN_ID, ADMIN);
     }
 
     @Test
