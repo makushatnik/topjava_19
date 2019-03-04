@@ -17,10 +17,6 @@ public abstract class AbstractNamedEntity extends AbstractBaseEntity {
     protected AbstractNamedEntity() {
     }
 
-    protected AbstractNamedEntity(Integer id) {
-        super(id);
-    }
-
     protected AbstractNamedEntity(Integer id, String name) {
         super(id);
         this.name = name;

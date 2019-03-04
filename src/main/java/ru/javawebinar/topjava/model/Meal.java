@@ -5,14 +5,15 @@ import org.hibernate.validator.constraints.Range;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "meals"//,
-        //uniqueConstraints = { @UniqueConstraint( columnNames = {"user_id","date_time"},
-        //name = "meals_unique_user_datetime_idx")}
+@Table(name = "meals",
+        uniqueConstraints = { @UniqueConstraint( columnNames = {"user_id","date_time"},
+        name = "meals_unique_user_datetime_idx")}
 )
 public class Meal extends AbstractBaseEntity {
 
@@ -21,7 +22,8 @@ public class Meal extends AbstractBaseEntity {
     private LocalDateTime dateTime;
 
     @NotBlank
-    @Column(name = "description", nullable = false)
+    @Size(min = 2, max = 120)
+    @Column(name = "description", nullable = false, length = 120)
     private String description;
 
     @Range(min = 10, max = 10000)
@@ -29,8 +31,7 @@ public class Meal extends AbstractBaseEntity {
     private int calories;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    //@JoinColumn(name="user_id", nullable = false, insertable = false, updatable = false)
-    @JoinColumn(name="user_id")
+    @JoinColumn(name="user_id", nullable = false, updatable = false)
     private User user;
 
     public Meal() {
