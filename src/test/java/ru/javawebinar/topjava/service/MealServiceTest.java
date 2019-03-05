@@ -1,17 +1,16 @@
 package ru.javawebinar.topjava.service;
 
+import org.junit.AssumptionViolatedException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.rules.TestRule;
-import org.junit.rules.TestWatcher;
+import org.junit.rules.Stopwatch;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
@@ -21,6 +20,7 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.concurrent.TimeUnit;
 
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
@@ -45,20 +45,22 @@ public class MealServiceTest {
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
 
+    private static void logInfo(Description description, String status, long nanos) {
+        String testName = description.getMethodName();
+        log.info(String.format("Test %s %s, spent %d MSec",
+                testName, status, TimeUnit.NANOSECONDS.toMillis(nanos)));
+    }
+
     @Rule
-    public final TestRule watchman = new TestWatcher() {
-        private long time = 0l;
+    public Stopwatch stopwatch = new Stopwatch() {
         @Override
-        protected void starting(Description description) {
-            time = System.nanoTime();
-            super.starting(description);
+        protected void skipped(long nanos, AssumptionViolatedException e, Description description) {
+            logInfo(description, "skipped", nanos);
         }
 
         @Override
-        protected void finished(Description description) {
-            super.finished(description);
-            log.info("\'" + description.getMethodName() + "\' passed for the time: " +
-                    (Math.round((System.nanoTime() - time) / 1000000f)) + " MSec");
+        protected void finished(long nanos, Description description) {
+            logInfo(description, "finished", nanos);
         }
     };
 
@@ -81,13 +83,6 @@ public class MealServiceTest {
         newMeal.setId(created.getId());
         assertMatch(newMeal, created);
         assertMatch(service.getAll(USER_ID), newMeal, MEAL6, MEAL5, MEAL4, MEAL3, MEAL2, MEAL1);
-    }
-
-    @Test
-    public void createIncorrect() throws Exception {
-        thrown.expect(DataIntegrityViolationException.class);
-        Meal newMeal = getCreated();
-        service.create(newMeal, -1);
     }
 
     @Test

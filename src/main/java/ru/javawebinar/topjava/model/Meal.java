@@ -12,10 +12,18 @@ import java.time.LocalTime;
 
 @Entity
 @Table(name = "meals",
-        uniqueConstraints = { @UniqueConstraint( columnNames = {"user_id","date_time"},
-        name = "meals_unique_user_datetime_idx")}
+        uniqueConstraints = { @UniqueConstraint( columnNames = {"user_id","date_time"}, name = "meals_unique_user_datetime_idx")}
 )
+@NamedQueries({
+        @NamedQuery(name = Meal.ALL_SORTED, query = "from Meal m where m.user.id = :userId ORDER BY m.dateTime DESC"),
+        @NamedQuery(name = Meal.BETWEEN_SORTED, query = "from Meal m where m.dateTime between :startDate and :endDate " +
+            "and m.user.id = :userId ORDER BY m.dateTime DESC"),
+        @NamedQuery(name = Meal.DELETE, query = "DELETE FROM Meal m WHERE m.id = :id AND m.user.id = :userId")
+})
 public class Meal extends AbstractBaseEntity {
+    public static final String ALL_SORTED = "Meal.getAllSorted";
+    public static final String BETWEEN_SORTED = "Meal.getBetweenSorted";
+    public static final String DELETE = "Meal.DELETE";
 
     @NotNull
     @Column(name = "date_time", nullable = false, columnDefinition = "timestamp default now()")
@@ -42,12 +50,7 @@ public class Meal extends AbstractBaseEntity {
     }
 
     public Meal(Integer id, LocalDateTime dateTime, String description, int calories) {
-        this(id, null, dateTime, description, calories);
-    }
-
-    public Meal(Integer id, User user, LocalDateTime dateTime, String description, int calories) {
         super(id);
-        this.user = user;
         this.dateTime = dateTime;
         this.description = description;
         this.calories = calories;

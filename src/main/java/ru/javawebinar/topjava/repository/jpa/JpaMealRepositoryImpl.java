@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.MealRepository;
-import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -19,10 +18,6 @@ public class JpaMealRepositoryImpl implements MealRepository {
 
     @PersistenceContext
     private EntityManager em;
-
-    public Meal get(int id) {
-        return em.find(Meal.class, id);
-    }
 
     @Override
     public Meal get(int id, int userId) {
@@ -39,15 +34,14 @@ public class JpaMealRepositoryImpl implements MealRepository {
 
     @Override
     public List<Meal> getAll(int userId) {
-        return em.createQuery("from Meal m where m.user.id = :userId ORDER BY m.dateTime DESC", Meal.class)
+        return em.createNamedQuery(Meal.ALL_SORTED, Meal.class)
                 .setParameter("userId", userId)
                 .getResultList();
     }
 
     @Override
     public List<Meal> getBetween(LocalDateTime startDate, LocalDateTime endDate, int userId) {
-        return em.createQuery("from Meal m where m.dateTime between :startDate and :endDate " +
-                "and m.user.id = :userId ORDER BY m.dateTime DESC", Meal.class)
+        return em.createNamedQuery(Meal.BETWEEN_SORTED, Meal.class)
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
                 .setParameter("userId", userId)
@@ -68,14 +62,14 @@ public class JpaMealRepositoryImpl implements MealRepository {
             if (that != null) {
                 meal.setUser(that.getUser());
                 return em.merge(meal);
-            } else throw new NotFoundException("Запрашиваемая еда не существует!");
+            } else return null;
         }
     }
 
     @Override
     @Transactional
     public boolean delete(int id, int userId) {
-        return em.createQuery("DELETE FROM Meal m WHERE m.id = :id AND m.user.id = :userId")
+        return em.createNamedQuery(Meal.DELETE)
                 .setParameter("id", id)
                 .setParameter("userId", userId)
                 .executeUpdate() != 0;
