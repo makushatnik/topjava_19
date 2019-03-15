@@ -48,6 +48,11 @@ public class UserServiceImpl implements UserService {
         return checkNotFound(repository.getByEmail(email), "email=" + email);
     }
 
+    @Override
+    public User getWithMeals(int id) throws NotFoundException {
+        return checkNotFoundWithId(repository.get(id), id);
+    }
+
     @Cacheable("users")
     @Override
     public List<User> getAll() {

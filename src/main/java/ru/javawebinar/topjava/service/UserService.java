@@ -16,6 +16,8 @@ public interface UserService {
 
     User getByEmail(String email) throws NotFoundException;
 
+    User getWithMeals(int id) throws NotFoundException;
+
     void update(User user);
 
     List<User> getAll();
