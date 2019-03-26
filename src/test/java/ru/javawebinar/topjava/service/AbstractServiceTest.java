@@ -8,6 +8,8 @@ import org.junit.rules.ExternalResource;
 import org.junit.rules.Stopwatch;
 import org.junit.runner.RunWith;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -27,6 +29,12 @@ import static ru.javawebinar.topjava.util.ValidationUtil.getRootCause;
 @ActiveProfiles(resolver = ActiveDbProfileResolver.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 abstract public class AbstractServiceTest {
+    private static final String JPA = "jpa";
+    private static final String DATAJPA = "datajpa";
+
+    @Autowired
+    private Environment env;
+
     @ClassRule
     public static ExternalResource summary = TimingRules.SUMMARY;
 
@@ -49,5 +57,13 @@ abstract public class AbstractServiceTest {
         } catch (Exception e) {
             Assert.assertThat(getRootCause(e), instanceOf(exceptionClass));
         }
+    }
+
+    public boolean isJpa() {
+        boolean found = false;
+        for (String profile : env.getActiveProfiles()) {
+            if (JPA.equals(profile) || DATAJPA.equals(profile)) found = true;
+        }
+        return found;
     }
 }

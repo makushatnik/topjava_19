@@ -1,14 +1,13 @@
 package ru.javawebinar.topjava.web.meal;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.SecurityUtil;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -20,10 +19,7 @@ import static ru.javawebinar.topjava.util.DateTimeUtil.*;
 
 @Controller
 @RequestMapping("/meals")
-public class JspMealController {
-
-    @Autowired
-    public MealService service;
+public class JspMealController extends AbstractMealController {
 
     @GetMapping
     public String getMeals(Model model) {
@@ -38,26 +34,24 @@ public class JspMealController {
         return "mealForm";
     }
 
-    @GetMapping("/{id}")
-    public String getEditForm(@PathVariable int id, Model model) {
+    @GetMapping("/")
+    public String getEditForm(HttpServletRequest request, Model model) {
+        int id = getId(request);
         Objects.requireNonNull(id);
         model.addAttribute(service.get(id, SecurityUtil.authUserId()));
         return "mealForm";
     }
 
-    @GetMapping("/delete/{id}")
-    public String delete(@PathVariable("id") int id) {
+    @GetMapping("/delete/")
+    public String delete(HttpServletRequest request) {
+        int id = getId(request);
         Objects.requireNonNull(id);
         service.delete(id, SecurityUtil.authUserId());
         return "redirect:/meals";
     }
 
     @PostMapping(value = "/edit")
-    //public String createMeal(@RequestBody final Meal meal, Errors errors) {
-    public String createMeal(@ModelAttribute Meal meal, Model model) {
-//        if (errors.hasErrors()) {
-//            return "mealForm";
-//        }
+    public String create(@ModelAttribute Meal meal) {
 
         if (meal.getId() == null) {
             if (meal.getCalories() <= 0) throw new IllegalArgumentException("Не указаны калории!");
@@ -88,17 +82,8 @@ public class JspMealController {
         return "meals";
     }
 
-//    @RequestMapping(value = "/", method = RequestMethod.PUT)
-//    public String updateMeal(@RequestBody Meal meal) {
-//        if (meal.getId() == null) throw new IllegalArgumentException("Не указан ИД!");
-//        service.update(meal, SecurityUtil.authUserId());
-//        return "redirect:meals";
-//    }
-
-//    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-//    public String delete(@PathVariable("id") int id) {
-//        Objects.requireNonNull(id);
-//        service.delete(id, SecurityUtil.authUserId());
-//        return "redirect:meals";
-//    }
+    private int getId(HttpServletRequest request) {
+        String paramId = Objects.requireNonNull(request.getParameter("id"));
+        return Integer.parseInt(paramId);
+    }
 }

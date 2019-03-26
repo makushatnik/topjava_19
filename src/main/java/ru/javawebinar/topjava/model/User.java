@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -21,10 +20,8 @@ import static ru.javawebinar.topjava.util.MealsUtil.DEFAULT_CALORIES_PER_DAY;
 @NamedQueries({
         @NamedQuery(name = User.DELETE, query = "DELETE FROM User u WHERE u.id=:id"),
         @NamedQuery(name = User.BY_EMAIL, query = "SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.email=?1"),
-        @NamedQuery(name = User.ALL_SORTED, query = "SELECT u FROM User u ORDER BY u.name, u.email"),
-        @NamedQuery(name = User.BY_ID_WITH_ROLES, query = "SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.id=?1"),
-        @NamedQuery(name = User.ALL_SORTED_WITH_ROLES, query = "SELECT distinct u FROM User u LEFT JOIN FETCH u.roles " +
-                "ORDER BY u.name, u.email"),
+        @NamedQuery(name = User.ALL_SORTED, query = "SELECT distinct u FROM User u LEFT JOIN FETCH u.roles " +
+                "ORDER BY u.name, u.email")
 })
 @Entity
 @Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "email", name = "users_unique_email_idx")})
@@ -33,8 +30,6 @@ public class User extends AbstractNamedEntity implements Serializable {
     public static final String DELETE = "User.delete";
     public static final String BY_EMAIL = "User.getByEmail";
     public static final String ALL_SORTED = "User.getAllSorted";
-    public static final String BY_ID_WITH_ROLES = "User.getByIdWithRoles";
-    public static final String ALL_SORTED_WITH_ROLES = "User.getAllSortedWithRoles";
 
     @Column(name = "email", nullable = false, unique = true)
     @Email
@@ -45,7 +40,6 @@ public class User extends AbstractNamedEntity implements Serializable {
     @Column(name = "password", nullable = false)
     @NotBlank
     @Size(min = 5, max = 100)
-    //@Transient//or @JsonIgnore?
     private String password;
 
     @Column(name = "enabled", nullable = false, columnDefinition = "bool default true")
@@ -70,7 +64,6 @@ public class User extends AbstractNamedEntity implements Serializable {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")//, cascade = CascadeType.REMOVE, orphanRemoval = true)
     @OrderBy("dateTime DESC")
-    @JsonIgnore
     protected List<Meal> meals;
 
     public User() {

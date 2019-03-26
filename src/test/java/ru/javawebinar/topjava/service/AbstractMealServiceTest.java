@@ -3,14 +3,12 @@ package ru.javawebinar.topjava.service;
 import org.junit.Assume;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.StringJoiner;
 
 import static java.time.LocalDateTime.of;
 import static ru.javawebinar.topjava.MealTestData.*;
@@ -21,9 +19,6 @@ public abstract class AbstractMealServiceTest extends AbstractServiceTest {
 
     @Autowired
     protected MealService service;
-
-    @Autowired
-    private Environment env;
 
     @Test
     public void delete() throws Exception {
@@ -86,10 +81,7 @@ public abstract class AbstractMealServiceTest extends AbstractServiceTest {
 
     @Test
     public void testValidation() throws Exception {
-        StringJoiner joiner = new StringJoiner(",");
-        for (String profile : env.getActiveProfiles()) joiner.add(profile.toLowerCase());
-        String profiles = joiner.toString();
-        Assume.assumeTrue(profiles.contains("jpa") || profiles.contains("datajpa"));
+        Assume.assumeTrue(isJpa());
         //for jdbc nothing to do
         validateRootCause(() -> service.create(new Meal(null, of(2015, Month.JUNE, 1, 18, 0), "  ", 300), USER_ID), ConstraintViolationException.class);
         validateRootCause(() -> service.create(new Meal(null, null, "Description", 300), USER_ID), ConstraintViolationException.class);

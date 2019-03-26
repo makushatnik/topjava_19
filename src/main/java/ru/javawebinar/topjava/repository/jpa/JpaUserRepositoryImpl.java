@@ -39,10 +39,7 @@ public class JpaUserRepositoryImpl implements UserRepository {
     
     @Override
     public User get(int id) {
-        List<User> users = em.createNamedQuery(User.BY_ID_WITH_ROLES, User.class)
-                .setParameter(1, id)
-                .getResultList();
-        return DataAccessUtils.singleResult(users);
+        return em.find(User.class, id);
     }
 
     @Override
@@ -70,6 +67,6 @@ public class JpaUserRepositoryImpl implements UserRepository {
 
     @Override
     public List<User> getAll() {
-        return em.createNamedQuery(User.ALL_SORTED_WITH_ROLES, User.class).getResultList();
+        return em.createNamedQuery(User.ALL_SORTED, User.class).getResultList();
     }
 }

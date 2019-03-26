@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 @Repository
+@Transactional(readOnly = true)
 public class JdbcUserRepositoryImpl implements UserRepository {
 
     private static final Comparator<User> COMPARE_BY_NAME_EMAIL = (a, b) -> a.getName().compareTo(b.getName()) +
@@ -33,14 +35,19 @@ public class JdbcUserRepositoryImpl implements UserRepository {
 
     private final SimpleJdbcInsert insertUser;
 
+    //private final DataSourceTransactionManager transactionManager;
+
     @Autowired
-    public JdbcUserRepositoryImpl(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    public JdbcUserRepositoryImpl(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate
+            //DataSourceTransactionManager transactionManager
+    ) {
         this.insertUser = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
                 .usingGeneratedKeyColumns("id");
 
         this.jdbcTemplate = jdbcTemplate;
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+        //this.transactionManager = transactionManager;
     }
 
     @Override
@@ -51,21 +58,26 @@ public class JdbcUserRepositoryImpl implements UserRepository {
         if (user.isNew()) {
             Number newKey = insertUser.executeAndReturnKey(parameterSource);
             int userId = newKey.intValue();
-            if (user.getRoles() != null && user.getRoles().size() > 0) {
-                batchInsertRoles(new ArrayList<>(user.getRoles()), userId);
+            if (user.getRoles() != null && user.getRoles().size() > 0 &&
+                    !batchInsertRoles(new ArrayList<>(user.getRoles()), userId)) {
+                return null;
             }
             user.setId(userId);
+        //update user
         } else if (namedParameterJdbcTemplate.update(
                 "UPDATE users SET name=:name, email=:email, password=:password, " +
                         "registered=:registered, enabled=:enabled, calories_per_day=:caloriesPerDay WHERE id=:id", parameterSource) == 0) {
+            return null;
+        //update roles
+        } else if (deleteRoles(user.getId()) && !batchInsertRoles(new ArrayList<>(user.getRoles()), user.getId())) {
             return null;
         }
         return user;
     }
 
-    private void batchInsertRoles(final List<Role> roles, final int userId) {
+    private boolean batchInsertRoles(final List<Role> roles, final int userId) {
         final String sql = "INSERT INTO user_roles (user_id, role) VALUES (?,?)";
-        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+        return jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 Role role = roles.get(i);
@@ -78,13 +90,17 @@ public class JdbcUserRepositoryImpl implements UserRepository {
             public int getBatchSize() {
                 return roles.size();
             }
-        });
+        }).length > 0;
     }
 
     @Override
     @Transactional
     public boolean delete(int id) {
         return jdbcTemplate.update("DELETE FROM users WHERE id=?", id) != 0;
+    }
+
+    private boolean deleteRoles(int id) {
+        return jdbcTemplate.update("DELETE FROM user_roles WHERE user_id=?", id) != 0;
     }
 
     @Override
