@@ -47,8 +47,8 @@
                 <td>${fn:formatDateTime(meal.dateTime)}</td>
                 <td>${meal.description}</td>
                 <td>${meal.calories}</td>
-                <td><a href="${ctx}/meals/?id=${meal.id}"><spring:message code="common.update"/></a></td>
-                <td><a href="${ctx}/meals/delete/?id=${meal.id}"><spring:message code="common.delete"/></a></td>
+                <td><a href="${ctx}/meals/edit?id=${meal.id}"><spring:message code="common.update"/></a></td>
+                <td><a href="${ctx}/meals/delete?id=${meal.id}"><spring:message code="common.delete"/></a></td>
             </tr>
         </c:forEach>
     </table>

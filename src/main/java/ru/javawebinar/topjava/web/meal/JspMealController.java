@@ -21,7 +21,7 @@ import static ru.javawebinar.topjava.util.DateTimeUtil.*;
 @RequestMapping("/meals")
 public class JspMealController extends AbstractMealController {
 
-    @GetMapping
+    @GetMapping("/")
     public String getMeals(Model model) {
         model.addAttribute("meals", MealsUtil.getWithExcess(service.getAll(SecurityUtil.authUserId()),
                 SecurityUtil.authUserCaloriesPerDay()));
@@ -34,7 +34,7 @@ public class JspMealController extends AbstractMealController {
         return "mealForm";
     }
 
-    @GetMapping("/")
+    @GetMapping("/edit")
     public String getEditForm(HttpServletRequest request, Model model) {
         int id = getId(request);
         Objects.requireNonNull(id);
@@ -42,7 +42,7 @@ public class JspMealController extends AbstractMealController {
         return "mealForm";
     }
 
-    @GetMapping("/delete/")
+    @GetMapping("/delete")
     public String delete(HttpServletRequest request) {
         int id = getId(request);
         Objects.requireNonNull(id);

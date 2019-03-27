@@ -16,6 +16,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import ru.javawebinar.topjava.ActiveDbProfileResolver;
+import ru.javawebinar.topjava.Profiles;
 import ru.javawebinar.topjava.TimingRules;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -29,8 +30,6 @@ import static ru.javawebinar.topjava.util.ValidationUtil.getRootCause;
 @ActiveProfiles(resolver = ActiveDbProfileResolver.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 abstract public class AbstractServiceTest {
-    private static final String JPA = "jpa";
-    private static final String DATAJPA = "datajpa";
 
     @Autowired
     private Environment env;
@@ -62,7 +61,7 @@ abstract public class AbstractServiceTest {
     public boolean isJpa() {
         boolean found = false;
         for (String profile : env.getActiveProfiles()) {
-            if (JPA.equals(profile) || DATAJPA.equals(profile)) found = true;
+            if (Profiles.JPA.equals(profile) || Profiles.DATAJPA.equals(profile)) found = true;
         }
         return found;
     }

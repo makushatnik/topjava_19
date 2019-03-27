@@ -10,7 +10,7 @@ public abstract class AbstractJpaUserServiceTest extends AbstractUserServiceTest
 
     @Before
     public void setUp() throws Exception {
-        cacheManager.getCache("users").clear();
+        super.setUp();
         jpaUtil.clear2ndLevelHibernateCache();
     }
 }
