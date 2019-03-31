@@ -4,6 +4,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,7 +32,7 @@ public class UserTestData {
     }
 
     public static ResultMatcher contentJson(User... expected) {
-        return result -> assertMatch(readListFromJsonMvcResult(result, User.class), List.of(expected));
+        return result -> assertMatch(readListFromJsonMvcResult(result, User.class), Arrays.asList(expected));
     }
 
     public static ResultMatcher contentJson(User expected) {
