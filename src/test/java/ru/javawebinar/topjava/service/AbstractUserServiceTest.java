@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static ru.javawebinar.topjava.TestUtil.assertMatch;
 import static ru.javawebinar.topjava.UserTestData.*;
 
 public abstract class AbstractUserServiceTest extends AbstractServiceTest {
@@ -47,7 +48,7 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     @Test
     void delete() throws Exception {
         service.delete(USER_ID);
-        assertMatch(service.getAll(), ADMIN);
+        assertMatch(service.getAll(), ADMIN, "registered", "meals");
     }
 
     @Test

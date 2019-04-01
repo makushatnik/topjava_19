@@ -9,13 +9,14 @@ import ru.javawebinar.topjava.web.SecurityUtil;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.javawebinar.topjava.MealTestData.*;
-import static ru.javawebinar.topjava.TestUtil.readFromJson;
+import static ru.javawebinar.topjava.TestUtil.*;
 
 class MealRestControllerTest extends AbstractControllerTest {
     private static final String REST_URL = MealRestController.REST_URL + '/';
@@ -49,8 +50,9 @@ class MealRestControllerTest extends AbstractControllerTest {
         Meal returned = readFromJson(action, Meal.class);
         expected.setId(returned.getId());
 
-        assertMatch(returned, expected);
-        assertMatch(mealService.getAll(SecurityUtil.authUserId()), MEALS);
+        assertMatch(returned, expected, "user");
+        assertMatch(mealService.getAll(SecurityUtil.authUserId()),
+                Arrays.asList(expected, MEAL6, MEAL5, MEAL4, MEAL3, MEAL2));
     }
 
     @Test
@@ -64,7 +66,7 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .content(JsonUtil.writeValue(updated)))
                 .andExpect(status().isNoContent());
 
-        assertMatch(mealService.get(MEAL1_ID, SecurityUtil.authUserId()), updated);
+        assertMatch(mealService.get(MEAL1_ID, SecurityUtil.authUserId()), updated, "user");
     }
 
     @Test
@@ -72,6 +74,7 @@ class MealRestControllerTest extends AbstractControllerTest {
         mockMvc.perform(delete(REST_URL + MEAL1_ID))
                 .andDo(print())
                 .andExpect(status().isNoContent());
-        assertMatch(mealService.getAll(SecurityUtil.authUserId()), MEALS);
+        assertMatch(mealService.getAll(SecurityUtil.authUserId()),
+                Arrays.asList(MEAL6, MEAL5, MEAL4, MEAL3, MEAL2), "user");
     }
 }
