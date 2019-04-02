@@ -44,7 +44,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
         mockMvc.perform(delete(REST_URL + USER_ID))
                 .andDo(print())
                 .andExpect(status().isNoContent());
-        assertMatch(userService.getAll(), ADMIN, "registered", "meals");
+        assertMatch(userService.getAll(), ADMIN);
     }
 
     @Test
@@ -57,7 +57,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
                 .content(JsonUtil.writeValue(updated)))
                 .andExpect(status().isNoContent());
 
-        assertMatch(userService.get(USER_ID), updated, "registered", "meals");
+        assertMatch(userService.get(USER_ID), updated);
     }
 
     @Test
@@ -71,7 +71,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
         User returned = readFromJson(action, User.class);
         expected.setId(returned.getId());
 
-        assertMatch(returned, expected, "registered", "meals");
+        assertMatch(returned, expected);
         assertMatch(userService.getAll(), ADMIN, expected, USER);
     }
 

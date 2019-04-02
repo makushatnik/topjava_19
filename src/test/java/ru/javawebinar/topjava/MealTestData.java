@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static java.time.LocalDateTime.of;
+import static org.assertj.core.api.Assertions.assertThat;
 import static ru.javawebinar.topjava.TestUtil.*;
 import static ru.javawebinar.topjava.model.AbstractBaseEntity.START_SEQ;
 
@@ -34,15 +35,31 @@ public class MealTestData {
         return new Meal(MEAL1_ID, MEAL1.getDateTime(), "Обновленный завтрак", 200);
     }
 
-    public static ResultMatcher contentJson(List<Meal> expected) {
-        return result -> assertMatch(readListFromJsonMvcResult(result, Meal.class), expected);
+    public static <T> void assertMatch(T actual, T expected) {
+        assertThat(actual).isEqualToIgnoringGivenFields(expected, "user");
     }
 
-    public static ResultMatcher contentJson(Meal... expected) {
+    public static <T> void assertMatch(T actual, T expected, String... ignoreFields) {
+        assertThat(actual).isEqualToIgnoringGivenFields(expected, ignoreFields);
+    }
+
+    public static <T> void assertMatch(Iterable<T> actual, T... expected) {
+        assertMatch(actual, Arrays.asList(expected));
+    }
+
+    public static <T> void assertMatch(Iterable<T> actual, Iterable<T> expected) {
+        assertThat(actual).usingElementComparatorIgnoringFields("user").isEqualTo(expected);
+    }
+
+    public static <T> ResultMatcher contentJson(List<T> expected, Class<T> clazz) {
+        return result -> assertMatch(readListFromJsonMvcResult(result, clazz), expected);
+    }
+
+    public static <T> ResultMatcher contentJson(Class<T> clazz, T... expected) {
         return result -> assertMatch(readListFromJsonMvcResult(result, Meal.class), Arrays.asList(expected));
     }
 
-    public static ResultMatcher contentJson(Meal expected) {
-        return result -> assertMatch(readFromJsonMvcResult(result, Meal.class), expected);
+    public static <T> ResultMatcher contentJson(T expected, Class<T> clazz) {
+        return result -> assertMatch(readFromJsonMvcResult(result, clazz), expected);
     }
 }

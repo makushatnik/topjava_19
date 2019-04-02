@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.to.MealTo;
+import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.SecurityUtil;
 import ru.javawebinar.topjava.web.json.JsonUtil;
@@ -16,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.javawebinar.topjava.MealTestData.*;
-import static ru.javawebinar.topjava.TestUtil.*;
+import static ru.javawebinar.topjava.TestUtil.readFromJson;
 
 class MealRestControllerTest extends AbstractControllerTest {
     private static final String REST_URL = MealRestController.REST_URL + '/';
@@ -26,7 +28,7 @@ class MealRestControllerTest extends AbstractControllerTest {
         mockMvc.perform(get(REST_URL))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(contentJson(MEALS));
+                .andExpect(contentJson(MealsUtil.getWithExcess(MEALS, SecurityUtil.authUserCaloriesPerDay()), MealTo.class));
     }
 
     @Test
@@ -36,7 +38,7 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andDo(print())
                 // https://jira.spring.io/browse/SPR-14472
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(contentJson(MEAL1));
+                .andExpect(contentJson(MEAL1, Meal.class));
     }
 
     @Test
@@ -50,9 +52,9 @@ class MealRestControllerTest extends AbstractControllerTest {
         Meal returned = readFromJson(action, Meal.class);
         expected.setId(returned.getId());
 
-        assertMatch(returned, expected, "user");
+        assertMatch(returned, expected);
         assertMatch(mealService.getAll(SecurityUtil.authUserId()),
-                Arrays.asList(expected, MEAL6, MEAL5, MEAL4, MEAL3, MEAL2));
+                Arrays.asList(expected, MEAL6, MEAL5, MEAL4, MEAL3, MEAL2, MEAL1));
     }
 
     @Test
@@ -66,7 +68,7 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .content(JsonUtil.writeValue(updated)))
                 .andExpect(status().isNoContent());
 
-        assertMatch(mealService.get(MEAL1_ID, SecurityUtil.authUserId()), updated, "user");
+        assertMatch(mealService.get(MEAL1_ID, SecurityUtil.authUserId()), updated);
     }
 
     @Test
@@ -75,6 +77,6 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andDo(print())
                 .andExpect(status().isNoContent());
         assertMatch(mealService.getAll(SecurityUtil.authUserId()),
-                Arrays.asList(MEAL6, MEAL5, MEAL4, MEAL3, MEAL2), "user");
+                Arrays.asList(MEAL6, MEAL5, MEAL4, MEAL3, MEAL2));
     }
 }
