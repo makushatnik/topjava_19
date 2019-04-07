@@ -29,8 +29,8 @@ public class MealRestController extends AbstractMealController {
         return super.get(id);
     }
 
-    @PostMapping(value = "/filter", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public List<MealTo> getBetween(@RequestBody MealFilter filter) {
+    @GetMapping("/filter")
+    public List<MealTo> getBetween(MealFilter filter) {
         return super.getBetween(filter.getStartDate(), filter.getStartTime(),
                 filter.getEndDate(), filter.getEndTime());
     }

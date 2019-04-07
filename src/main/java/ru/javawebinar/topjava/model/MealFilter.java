@@ -1,12 +1,18 @@
 package ru.javawebinar.topjava.model;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class MealFilter {
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
+    @DateTimeFormat(pattern = "HH:mm")
     private LocalTime startTime;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
+    @DateTimeFormat(pattern = "HH:mm")
     private LocalTime endTime;
 
     public LocalDate getStartDate() {
