@@ -5,9 +5,18 @@ function makeEditable(ctx) {
     form = $('#detailsForm');
     $(".delete").click(function () {
         if (confirm('Are you sure?')) {
-            deleteRow($(this).attr("id"));
+            let parent = $(this).parents("." + ctx.entity);
+            if (parent.length) {
+                deleteRow(parent.attr("id"));
+            }
         }
     });
+    $(".edit").click(function () {
+        let parent = $(this).parents("." + ctx.entity);
+        if (parent.length) {
+            editRow(parent.attr("id"));
+        }
+    })
 
     $(document).ajaxError(function (event, jqXHR, options, jsExc) {
         failNoty(jqXHR);
@@ -19,6 +28,21 @@ function makeEditable(ctx) {
 
 function add() {
     form.find(":input").val("");
+    $("#editRow").modal();
+}
+
+function editRow(id) {
+    let curRow = $("#datatable").find("#" + id);
+    if (!curRow.length) return;
+    let cols = context.formColumns;
+
+    form.find("#id").val(id);
+    cols.forEach(function (x) {
+        let elem = form.find("#" + x);
+        if (elem.length) {
+            elem.val(curRow.find("." + x).text());
+        }
+    });
     $("#editRow").modal();
 }
 

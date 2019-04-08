@@ -1,27 +1,20 @@
-// $(document).ready(function () {
 $(function () {
     makeEditable({
-            entity: "user",
-            ajaxUrl: "ajax/admin/users/",
-            formColumns: ["name","email","enabled"],
+            entity: "meal",
+            ajaxUrl: "ajax/meals/",
+            formColumns: ["dateTime","description","calories"],
             datatableApi: $("#datatable").DataTable({
                 "paging": false,
                 "info": true,
                 "columns": [
                     {
-                        "data": "name"
+                        "data": "dateTime"
                     },
                     {
-                        "data": "email"
+                        "data": "description"
                     },
                     {
-                        "data": "roles"
-                    },
-                    {
-                        "data": "enabled"
-                    },
-                    {
-                        "data": "registered"
+                        "data": "calories"
                     },
                     {
                         "defaultContent": "Edit",
@@ -35,7 +28,7 @@ $(function () {
                 "order": [
                     [
                         0,
-                        "asc"
+                        "desc"
                     ]
                 ]
             })
