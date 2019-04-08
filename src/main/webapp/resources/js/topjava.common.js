@@ -16,7 +16,7 @@ function makeEditable(ctx) {
         if (parent.length) {
             editRow(parent.attr("id"));
         }
-    })
+    });
 
     $(document).ajaxError(function (event, jqXHR, options, jsExc) {
         failNoty(jqXHR);
@@ -40,7 +40,11 @@ function editRow(id) {
     cols.forEach(function (x) {
         let elem = form.find("#" + x);
         if (elem.length) {
-            elem.val(curRow.find("." + x).text());
+            if (x === "enabled") {
+                elem.val(curRow.find("." + x).val());
+            } else {
+                elem.val(curRow.find("." + x).text());
+            }
         }
     });
     $("#editRow").modal();
@@ -57,7 +61,13 @@ function deleteRow(id) {
 }
 
 function updateTable() {
-    $.get(context.ajaxUrl, function (data) {
+    let params = {}, url = context.ajaxUrl;
+    if (context.entity === "meal") {
+        let filterForm = $("#filter");
+        url += "filter";
+        params = filterForm.serialize();
+    }
+    $.get(url, params, function (data) {
         context.datatableApi.clear().rows.add(data).draw();
     });
 }
@@ -72,6 +82,34 @@ function save() {
         updateTable();
         successNoty("Saved");
     });
+}
+
+function switchEnabled(id, enabled) {
+    if (context.entity === "user") {
+        $.ajax({
+            type: "POST",
+            url: context.ajaxUrl + "switch",
+            data: {id: id, enabled: enabled}
+        }).done(function () {
+            successNoty("Switched");
+        });
+    }
+}
+
+function clearFilter() {
+    $("#filter").find(":input").val("");
+}
+
+function filter() {
+    /*let filterForm = $("#filter");
+    $.ajax({
+        type: "GET",
+        url: context.ajaxUrl + "filter",
+        data: filterForm.serialize()
+    }).done(function () {
+        updateTable();
+    });*/
+    updateTable();
 }
 
 let failedNote;

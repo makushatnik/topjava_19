@@ -31,11 +31,11 @@
             </thead>
             <c:forEach items="${users}" var="user">
                 <jsp:useBean id="user" type="ru.javawebinar.topjava.model.User"/>
-                <tr class="user" id="${user.id}">
+                <tr class="user <%= user.isEnabled() ? "enabled" : "disabled"%>" id="${user.id}">
                     <td><span class="name"><c:out value="${user.name}"/></span></td>
                     <td><a href="mailto:${user.email}"><span class="email">${user.email}</span></a></td>
                     <td>${user.roles}</td>
-                    <td><input type="checkbox"
+                    <td><input type="checkbox" class="enabled" onclick="switchEnabled(${user.id}, this.checked)"
                                <c:if test="${user.enabled}">checked</c:if> /></td>
                     <td><fmt:formatDate value="${user.registered}" pattern="dd-MMMM-yyyy"/></td>
                     <td><a class="edit"><span class="fa fa-pencil"></span></a></td>
@@ -73,6 +73,12 @@
                         <label for="password" class="col-form-label"><spring:message code="user.password"/></label>
                         <input type="password" class="form-control" id="password" name="password"
                                placeholder="<spring:message code="user.password"/>">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="enabled" class="col-form-label"><spring:message code="user.active"/></label>
+                        <input type="checkbox" class="form-control" id="enabled" name="enabled"
+                               placeholder="<spring:message code="user.active"/>">
                     </div>
                 </form>
             </div>
