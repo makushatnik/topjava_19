@@ -74,12 +74,6 @@
                         <input type="password" class="form-control" id="password" name="password"
                                placeholder="<spring:message code="user.password"/>">
                     </div>
-
-                    <div class="form-group">
-                        <label for="enabled" class="col-form-label"><spring:message code="user.active"/></label>
-                        <input type="checkbox" class="form-control" id="enabled" name="enabled"
-                               placeholder="<spring:message code="user.active"/>">
-                    </div>
                 </form>
             </div>
             <div class="modal-footer">

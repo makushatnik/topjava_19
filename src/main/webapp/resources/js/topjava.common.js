@@ -40,11 +40,7 @@ function editRow(id) {
     cols.forEach(function (x) {
         let elem = form.find("#" + x);
         if (elem.length) {
-            if (x === "enabled") {
-                elem.val(curRow.find("." + x).val());
-            } else {
-                elem.val(curRow.find("." + x).text());
-            }
+            elem.val(curRow.find("." + x).text());
         }
     });
     $("#editRow").modal();
@@ -55,21 +51,19 @@ function deleteRow(id) {
         url: context.ajaxUrl + id,
         type: "DELETE"
     }).done(function () {
-        updateTable();
+        updateTableGet();
         successNoty("Deleted");
     });
 }
 
-function updateTable() {
-    let params = {}, url = context.ajaxUrl;
-    if (context.entity === "meal") {
-        let filterForm = $("#filter");
-        url += "filter";
-        params = filterForm.serialize();
-    }
-    $.get(url, params, function (data) {
+function updateTableGet() {
+    $.get(context.ajaxUrl, function (data) {
         context.datatableApi.clear().rows.add(data).draw();
     });
+}
+
+function updateTable(data) {
+    context.datatableApi.clear().rows.add(data).draw();
 }
 
 function save() {
@@ -79,7 +73,7 @@ function save() {
         data: form.serialize()
     }).done(function () {
         $("#editRow").modal("hide");
-        updateTable();
+        updateTableGet();
         successNoty("Saved");
     });
 }
@@ -97,19 +91,11 @@ function switchEnabled(id, enabled) {
 }
 
 function clearFilter() {
-    $("#filter").find(":input").val("");
+    context.clearFilter();
 }
 
 function filter() {
-    /*let filterForm = $("#filter");
-    $.ajax({
-        type: "GET",
-        url: context.ajaxUrl + "filter",
-        data: filterForm.serialize()
-    }).done(function () {
-        updateTable();
-    });*/
-    updateTable();
+    context.filter();
 }
 
 let failedNote;
