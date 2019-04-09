@@ -78,26 +78,6 @@ function save() {
     });
 }
 
-function switchEnabled(id, enabled) {
-    if (context.entity === "user") {
-        $.ajax({
-            type: "POST",
-            url: context.ajaxUrl + "switch",
-            data: {id: id, enabled: enabled}
-        }).done(function () {
-            successNoty("Switched");
-        });
-    }
-}
-
-function clearFilter() {
-    context.clearFilter();
-}
-
-function filter() {
-    context.filter();
-}
-
 let failedNote;
 
 function closeNoty() {

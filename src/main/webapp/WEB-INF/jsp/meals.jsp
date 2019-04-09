@@ -13,7 +13,7 @@
     <div class="container">
         <h3 class="text-center"><spring:message code="meal.title"/></h3>
 
-        <a class="btn btn-secondary" onclick="clearFilter()"><spring:message code="common.clear"/></a>
+        <a class="btn btn-secondary" onclick="context.clearFilter()"><spring:message code="common.clear"/></a>
         <form method="post" action="meals/filter" id="filter">
             <dl>
                 <dt><spring:message code="meal.startDate"/>:</dt>
@@ -31,7 +31,7 @@
                 <dt><spring:message code="meal.endTime"/>:</dt>
                 <dd><input type="time" name="endTime" id="endTime" value="${param.endTime}"></dd>
             </dl>
-            <a class="btn btn-success" onclick="filter()"><spring:message code="meal.filter"/></a>
+            <a class="btn btn-success" onclick="context.filter()"><spring:message code="meal.filter"/></a>
         </form>
         <button class="btn btn-primary" onclick="add()">
             <span class="fa fa-plus"></span>

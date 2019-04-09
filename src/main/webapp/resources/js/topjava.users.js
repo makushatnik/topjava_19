@@ -4,6 +4,19 @@ $(function () {
             entity: "user",
             ajaxUrl: "ajax/admin/users/",
             formColumns: ["name","email","enabled"],
+            switchEnabled: function switchEnabled(id) {
+                $.ajax({
+                    type: "POST",
+                    url: context.ajaxUrl + "switch",
+                    data: {id: id}
+                }).done(function (enabled) {
+                    let user = $("#" + id);
+                    user.toggleClass("enabled", enabled);
+                    user.toggleClass("disabled", !enabled);
+                    user.find(".enabled").prop('checked', enabled);
+                    successNoty(enabled ? "Enabled" : "Disabled");
+                });
+            },
             datatableApi: $("#datatable").DataTable({
                 "paging": false,
                 "info": true,

@@ -70,11 +70,12 @@ public class UserServiceImpl implements UserService {
     @Override
     @CacheEvict(value = "users", allEntries = true)
     @Transactional
-    public void switchEnabled(int id, boolean enabled) throws NotFoundException {
+    public boolean switchEnabled(int id) throws NotFoundException {
         User user = get(id);
         if (user == null) throw new NotFoundException("That user not found!");
 
-        user.setEnabled(enabled);
+        user.setEnabled(!user.isEnabled());
         update(user);
+        return user.isEnabled();
     }
 }

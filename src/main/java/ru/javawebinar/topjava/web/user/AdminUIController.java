@@ -44,9 +44,7 @@ public class AdminUIController extends AbstractUserController {
     }
 
     @PostMapping("/switch")
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void switchEnabled(@RequestParam Integer id,
-                              @RequestParam boolean enabled) {
-        service.switchEnabled(id, enabled);
+    public boolean switchEnabled(@RequestParam Integer id) {
+        return service.switchEnabled(id);
     }
 }

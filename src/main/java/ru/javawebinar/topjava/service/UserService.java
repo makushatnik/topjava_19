@@ -22,5 +22,5 @@ public interface UserService {
 
     User getWithMeals(int id);
 
-    void switchEnabled(int id, boolean enabled) throws NotFoundException;
+    boolean switchEnabled(int id) throws NotFoundException;
 }
