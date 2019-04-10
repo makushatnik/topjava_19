@@ -72,10 +72,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public boolean switchEnabled(int id) throws NotFoundException {
         User user = get(id);
-        if (user == null) throw new NotFoundException("That user not found!");
-
         user.setEnabled(!user.isEnabled());
-        update(user);
+        repository.save(user);
         return user.isEnabled();
     }
 }

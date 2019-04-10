@@ -24,12 +24,11 @@ tr[data-mealExcess="true"] {
 }
 
 tr.enabled {
-    color: green;
     font-weight: bold;
 }
 
 tr.disabled {
-    color: red;
+    opacity: 0.3;
 }
 
 .fa {
