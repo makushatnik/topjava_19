@@ -39,6 +39,14 @@ class RootControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("meals"))
                 .andExpect(forwardedUrl("/WEB-INF/jsp/meals.jsp"))
-                .andExpect(model().attribute("meals", getWithExcess(MEALS, SecurityUtil.authUserCaloriesPerDay())));
+                .andExpect(model().attribute("meals", getWithExcess(MEALS, USER.getCaloriesPerDay())));
     }
+
+//    @Test
+//    void testMealsUnAuth() throws Exception {
+//        mockMvc.perform(get("/meals"))
+//                .andDo(print())
+//                .andExpect(status().is3xxRedirection())
+//                .andExpect(redirectedUrl("http://localhost/login"));
+//    }
 }

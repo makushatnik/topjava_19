@@ -31,7 +31,7 @@ public class UserTestData {
     }
 
     public static ResultMatcher contentJson(User... expected) {
-        return result -> assertMatch(readListFromJsonMvcResult(result, User.class), List.of(expected));
+        return result -> assertMatch(readListFromJsonMvcResult(result, User.class), Arrays.asList(expected));
     }
 
     public static ResultMatcher contentJson(User expected) {
