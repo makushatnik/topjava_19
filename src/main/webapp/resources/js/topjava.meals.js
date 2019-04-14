@@ -57,10 +57,15 @@ $(function () {
                 ]
             ],
             "createdRow": function (row, data, dataIndex) {
-                console.log(data);
                 $(row).attr("data-mealExcess", !!data.excess);
             }
         }),
         updateTable: updateFilteredTable
     });
+
+    $('#dateTime').datetimepicker({ format: 'Y-m-d H:i' });
+    $('#startDate').datetimepicker({ format: 'Y-m-d' });
+    $('#startTime').datetimepicker({ format: 'H:i' });
+    $('#endDate').datetimepicker({ format: 'Y-m-d' });
+    $('#endTime').datetimepicker({ format: 'H:i' });
 });
