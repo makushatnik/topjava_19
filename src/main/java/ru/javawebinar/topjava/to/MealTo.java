@@ -7,19 +7,21 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class MealTo extends BaseTo {
 
-    @NotNull
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @NotNull(message = "must be not empty")
+    //@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm")
     private LocalDateTime dateTime;
 
-    @NotBlank
+    @NotBlank(message = "must be not empty")
     @Size(min = 2, max = 100, message = "length must between 2 and 100 characters")
     private String description;
 
-    @NotNull
-    @Range(min = 1, max = 10000)
+    @NotNull(message = "must be not empty")
+    @Range(min = 1, max = 10000, message = "must be a correct integer until 5000")
     private Integer calories;
 
     private boolean excess;
@@ -67,22 +69,22 @@ public class MealTo extends BaseTo {
         this.excess = excess;
     }
 
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//        MealTo that = (MealTo) o;
-//        return calories == that.calories &&
-//                excess == that.excess &&
-//                Objects.equals(id, that.id) &&
-//                Objects.equals(dateTime, that.dateTime) &&
-//                Objects.equals(description, that.description);
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return Objects.hash(id, dateTime, description, calories, excess);
-//    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MealTo that = (MealTo) o;
+        return calories.equals(that.calories) &&
+                excess == that.excess &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(dateTime, that.dateTime) &&
+                Objects.equals(description, that.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, dateTime, description, calories, excess);
+    }
 
     @Override
     public String toString() {

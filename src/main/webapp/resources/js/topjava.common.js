@@ -18,7 +18,7 @@ function makeEditable(ctx) {
                 return data.replace('T',' ');
             },
             "datetime json": function (data) {
-                return data.substring(0, 10) + 'T' + data.substring(11);
+                return data.substring(0, 10) + 'T' + data.substring(11,16);
             }
         }
     });
@@ -33,7 +33,6 @@ function add() {
 function updateRow(id) {
     $("#modalTitle").html(i18n["editTitle"]);
     $.get(context.ajaxUrl + id, function (data) {
-        console.log(data);
         $.each(data, function (key, value) {
             if (key === 'dateTime' || key === 'registered') {
                 value = value.replace('T', ' ');
