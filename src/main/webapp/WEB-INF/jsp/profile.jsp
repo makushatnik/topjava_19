@@ -33,6 +33,10 @@
                             <spring:message code="common.save"/>
                         </button>
                     </div>
+				<form:errors path="name" />
+				<form:errors path="email" />
+				<form:errors path="password" />
+				<form:errors path="caloriesPerDay" />
                 </form:form>
             </div>
         </div>

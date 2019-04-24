@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.web;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.support.SessionStatus;
 import ru.javawebinar.topjava.to.UserTo;
 import ru.javawebinar.topjava.util.UserUtil;
+import ru.javawebinar.topjava.util.ValidationUtil;
+import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 import ru.javawebinar.topjava.web.user.AbstractUserController;
 
 import javax.validation.Valid;
@@ -46,7 +49,7 @@ public class RootController extends AbstractUserController {
     @PostMapping("/profile")
     public String updateProfile(@Valid UserTo userTo, BindingResult result, SessionStatus status) {
         if (result.hasErrors()) {
-            return "profile";
+            throw new IllegalRequestDataException(ValidationUtil.getErrorResponse(result));
         } else {
             super.update(userTo, SecurityUtil.authUserId());
             SecurityUtil.get().update(userTo);
@@ -63,10 +66,11 @@ public class RootController extends AbstractUserController {
     }
 
     @PostMapping("/register")
-    public String saveRegister(@Valid UserTo userTo, BindingResult result, SessionStatus status, ModelMap model) {
+    public String saveRegister(@Valid UserTo userTo, BindingResult result, SessionStatus status) {
         if (result.hasErrors()) {
-            model.addAttribute("register", true);
-            return "profile";
+            throw new IllegalRequestDataException(ValidationUtil.getErrorResponse(result));
+        } else if (super.getByMail(userTo.getEmail()) != null) {
+            throw new DataIntegrityViolationException("User with that email already exists!");
         } else {
             super.create(UserUtil.createNewFromTo(userTo));
             status.setComplete();
