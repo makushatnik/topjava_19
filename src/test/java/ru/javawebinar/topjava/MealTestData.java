@@ -49,7 +49,7 @@ public class MealTestData {
     }
 
     public static ResultMatcher contentJson(MealTo... expected) {
-        return contentJson(List.of(expected));
+        return contentJson(Arrays.asList(expected));
     }
 
     public static ResultMatcher contentJson(Iterable<MealTo> expected) {
